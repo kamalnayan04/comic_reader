@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "772131957343",
+    "firebase_url": "https://comicreader-b5571-default-rtdb.firebaseio.com",
+    "project_id": "comicreader-b5571",
+    "storage_bucket": "comicreader-b5571.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:772131957343:android:b5c0cd3e251422e6ff49ea",
+        "android_client_info": {
+          "package_name": "com.collegetimedevelopers.comic_reader"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "772131957343-fl8ibu8q9r1kavdm8dqv4ebm8h2dt6bf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvDUSaaucDQlEK_3H2xnR3xHpFSCma824"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "772131957343-fl8ibu8q9r1kavdm8dqv4ebm8h2dt6bf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
