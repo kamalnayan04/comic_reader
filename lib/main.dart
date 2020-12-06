@@ -1,110 +1,136 @@
+import 'dart:io';
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/all.dart';
 
-void main() {
-  runApp(MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final FirebaseApp app = await Firebase.initializeApp(
+      name: 'comic_reader_app',
+      options: Platform.isMacOS || Platform.isIOS
+          ? FirebaseOptions(
+              appId: 'IOS KEY',
+              apiKey: 'AIzaSyBvDUSaaucDQlEK_3H2xnR3xHpFSCma824',
+              projectId: 'comicreader-b5571',
+              messagingSenderId: '772131957343',
+              databaseURL:
+                  'https://comicreader-b5571-default-rtdb.firebaseio.com/',
+            )
+          : FirebaseOptions(
+              appId: '1:772131957343:android:b5c0cd3e251422e6ff49ea',
+              apiKey: 'AIzaSyBvDUSaaucDQlEK_3H2xnR3xHpFSCma824',
+              projectId: 'comicreader-b5571',
+              messagingSenderId: '772131957343',
+              databaseURL:
+                  'https://comicreader-b5571-default-rtdb.firebaseio.com/',
+            ));
+  runApp(ProviderScope(
+    child: MyApp(
+      app: app,
+    ),
+  ));
 }
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
+
+  FirebaseApp app;
+
+  MyApp({this.app});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter  Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
-
-        // This makes the visual density adapt to the platform that you run
-        // the app on. For desktop platforms, the controls will be smaller and
-        // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Comic Reader', app: app),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({Key key, this.title, this.app}) : super(key: key);
 
   final String title;
+  final FirebaseApp app;
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  DatabaseReference _bannerRef;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  @override
+  void initState() {
+    super.initState();
+
+    final FirebaseDatabase _database = new FirebaseDatabase(app: widget.app);
+    _bannerRef = _database.reference().child('Banners');
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
+        backgroundColor: Color(0xFFF44A3E),
+        title: Text(
+          widget.title,
+          style: TextStyle(color: Colors.white),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      body: FutureBuilder<List<String>>(
+        future: getBanners(_bannerRef),
+        builder: (context, snapshot) {
+          if (snapshot.hasData)
+            return Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  CarouselSlider(
+                    items: snapshot.data
+                        .map((e) => Builder(
+                              builder: (context) {
+                                return Image.network(
+                                  e,
+                                  fit: BoxFit.cover,
+                                );
+                              },
+                            ))
+                        .toList(),
+                    options: CarouselOptions(
+                      autoPlay: true,
+                      enlargeCenterPage: true,
+                      viewportFraction: 1,
+                      initialPage: 0,
+                      height: MediaQuery.of(context).size.height / 3,
+                    ),
+                  )
+                ]);
+          else if (snapshot.hasError)
+            return Center(
+              child: Text(
+                '${snapshot.error}',
+              ),
+            );
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      ),
     );
+  }
+
+  Future<List<String>> getBanners(DatabaseReference bannerRef) {
+    return bannerRef
+        .once()
+        .then((snapshot) => snapshot.value.cast<String>().toList());
   }
 }
