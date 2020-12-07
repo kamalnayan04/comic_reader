@@ -8,7 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:comic_reader/main.dart';
+import 'file:///C:/Users/KAMAL%20NAYAN/AndroidStudioProjects/comic_reader/lib/screens/main.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {

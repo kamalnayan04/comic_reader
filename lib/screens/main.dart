@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:comic_reader/Model/Comic.dart';
+import 'package:comic_reader/Model/comic.dart';
+import 'package:comic_reader/screens/chapter_screen.dart';
+import 'package:comic_reader/state/state_manager.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/all.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,6 +49,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter  Demo',
+      routes: {'chapters': (context) => ChapterScreen()},
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -168,7 +171,11 @@ class _MyHomePageState extends State<MyHomePage> {
                             crossAxisSpacing: 1.0,
                             children: comics.map((comic) {
                               return GestureDetector(
-                                onTap: () {},
+                                onTap: () {
+                                  context.read(comicSelected).state = comic;
+
+                                  Navigator.pushNamed(context, "chapters");
+                                },
                                 child: Card(
                                   elevation: 12,
                                   child: Stack(
