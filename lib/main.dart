@@ -177,6 +177,31 @@ class _MyHomePageState extends State<MyHomePage> {
                                       Image.network(
                                         comic.image,
                                         fit: BoxFit.cover,
+                                      ),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          Container(
+                                            color: Color(0xAA434343),
+                                            padding: EdgeInsets.all(8),
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    '${comic.name}',
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          )
+                                        ],
                                       )
                                     ],
                                   ),
