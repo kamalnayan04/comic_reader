@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:comic_reader/Model/Comic.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -66,7 +68,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  DatabaseReference _bannerRef;
+  DatabaseReference _bannerRef, _comicReference;
 
   @override
   void initState() {
@@ -74,6 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     final FirebaseDatabase _database = new FirebaseDatabase(app: widget.app);
     _bannerRef = _database.reference().child('Banners');
+    _comicReference = _database.reference().child('Comic');
   }
 
   @override
@@ -112,6 +115,81 @@ class _MyHomePageState extends State<MyHomePage> {
                       initialPage: 0,
                       height: MediaQuery.of(context).size.height / 3,
                     ),
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 4,
+                        child: Container(
+                          color: Color(0xFFF44A3E),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: Text(
+                              'NEW COMIC',
+                              style: TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          color: Colors.black,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: Text(''),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  FutureBuilder(
+                    future: getComic(_comicReference),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError)
+                        return Center(
+                          child: Text('${snapshot.error}'),
+                        );
+                      else if (snapshot.hasData) {
+                        List<Comic> comics = new List<Comic>();
+                        snapshot.data.forEach((item) {
+                          var comic =
+                              Comic.fromJson(json.decode(json.encode(item)));
+                          comics.add(comic);
+                        });
+                        return Expanded(
+                          child: GridView.count(
+                            crossAxisCount: 2,
+                            childAspectRatio: 0.8,
+                            padding: const EdgeInsets.all(4.0),
+                            mainAxisSpacing: 1.0,
+                            crossAxisSpacing: 1.0,
+                            children: comics.map((comic) {
+                              return GestureDetector(
+                                onTap: () {},
+                                child: Card(
+                                  elevation: 12,
+                                  child: Stack(
+                                    fit: StackFit.expand,
+                                    children: [
+                                      Image.network(
+                                        comic.image,
+                                        fit: BoxFit.cover,
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        );
+                      }
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    },
                   )
                 ]);
           else if (snapshot.hasError)
@@ -126,6 +204,10 @@ class _MyHomePageState extends State<MyHomePage> {
         },
       ),
     );
+  }
+
+  Future<List<dynamic>> getComic(DatabaseReference comicRef) {
+    return comicRef.once().then((snapshot) => snapshot.value);
   }
 
   Future<List<String>> getBanners(DatabaseReference bannerRef) {
