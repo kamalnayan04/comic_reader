@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:comic_reader/Model/comic.dart';
 import 'package:comic_reader/screens/chapter_screen.dart';
+import 'package:comic_reader/screens/read_screen.dart';
 import 'package:comic_reader/state/state_manager.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -49,7 +50,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter  Demo',
-      routes: {'chapters': (context) => ChapterScreen()},
+      routes: {
+        'chapters': (context) => ChapterScreen(),
+        '/read': (context) => ReadScreen()
+      },
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
